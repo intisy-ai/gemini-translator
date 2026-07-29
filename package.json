@@ -1,0 +1,21 @@
+{
+  "name": "gemini-translator",
+  "version": "0.1.0",
+  "description": "Gemini wire-format <-> canonical IR translator (Java + TeaVM single source), a core-ir submodule library.",
+  "main": "dist/index.js",
+  "type": "module",
+  "license": "MIT",
+  "author": "intisy",
+  "repository": { "type": "git", "url": "https://github.com/intisy-ai/gemini-translator.git" },
+  "keywords": ["gemini", "ir", "canonical-ir", "translator", "ai", "intisy"],
+  "files": ["dist/", "README.md", "LICENSE"],
+  "engines": { "node": ">=20.0.0" },
+  "scripts": {
+    "build:coreir": "npm --prefix core-ir install && npm --prefix core-ir run build",
+    "build:teavm": "node teavm-build.mjs --java-dir java --module :teavm-gemini --out src/generated/gemini-translator.teavm.js",
+    "build": "npm run build:coreir && npm run build:teavm && tsc && node build.mjs",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": { "typescript": "^5.6.0", "vitest": "^2.1.0", "@types/node": "^22.0.0", "esbuild": "^0.21.5" }
+}
