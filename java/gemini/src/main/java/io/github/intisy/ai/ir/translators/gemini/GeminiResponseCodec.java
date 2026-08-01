@@ -5,6 +5,7 @@ import io.github.intisy.ai.ir.IrResponse;
 import io.github.intisy.ai.ir.IrStopReason;
 import io.github.intisy.ai.ir.IrUsage;
 import io.github.intisy.ai.ir.ToolUseBlock;
+import io.github.intisy.ai.ir.json.JsonUtil;
 import io.github.intisy.ai.ir.spi.JsonCodec;
 
 import java.util.ArrayList;
@@ -42,23 +43,23 @@ final class GeminiResponseCodec {
             "candidates", "usageMetadata", "modelVersion", "responseId"));
 
     static IrResponse decodeResponse(JsonCodec json, String wireJson) {
-        Map<String, Object> root = GeminiJsonUtil.asMap(json.parse(wireJson));
+        Map<String, Object> root = JsonUtil.asMap(json.parse(wireJson));
         IrResponse r = new IrResponse();
         if (root == null) return r;
 
-        r.id = GeminiJsonUtil.asString(root.get("responseId"));
-        r.model = GeminiJsonUtil.asString(root.get("modelVersion"));
+        r.id = JsonUtil.asString(root.get("responseId"));
+        r.model = JsonUtil.asString(root.get("modelVersion"));
 
-        List<Object> candidates = GeminiJsonUtil.asList(root.get("candidates"));
+        List<Object> candidates = JsonUtil.asList(root.get("candidates"));
         if (candidates != null && !candidates.isEmpty()) {
-            Map<String, Object> candidate0 = GeminiJsonUtil.asMap(candidates.get(0));
+            Map<String, Object> candidate0 = JsonUtil.asMap(candidates.get(0));
             decodeCandidate(json, candidate0, r);
             if (candidates.size() > 1) {
                 putExtension(r, EXT_CANDIDATES_EXTRA, new ArrayList<>(candidates.subList(1, candidates.size())));
             }
         }
 
-        Map<String, Object> usageMetadata = GeminiJsonUtil.asMap(root.get("usageMetadata"));
+        Map<String, Object> usageMetadata = JsonUtil.asMap(root.get("usageMetadata"));
         r.usage = GeminiUsageCodec.decode(usageMetadata);
 
         for (Map.Entry<String, Object> e : root.entrySet()) {
@@ -71,7 +72,7 @@ final class GeminiResponseCodec {
 
     private static void decodeCandidate(JsonCodec json, Map<String, Object> candidate, IrResponse r) {
         if (candidate == null) return;
-        Map<String, Object> content = GeminiJsonUtil.asMap(candidate.get("content"));
+        Map<String, Object> content = JsonUtil.asMap(candidate.get("content"));
         r.content = content == null ? null : GeminiBlockCodec.decodePartsList(json, content.get("parts"));
 
         boolean hasToolUse = false;
@@ -84,12 +85,12 @@ final class GeminiResponseCodec {
             }
         }
 
-        String finishReasonRaw = GeminiJsonUtil.asString(candidate.get("finishReason"));
+        String finishReasonRaw = JsonUtil.asString(candidate.get("finishReason"));
         putExtension(r, EXT_FINISH_REASON_RAW, finishReasonRaw);
         r.stopReason = hasToolUse ? IrStopReason.TOOL_USE : GeminiFinishReason.toIr(finishReasonRaw);
 
         // Only a non-zero candidate index needs bookkeeping (0 is the default and needs no stash).
-        Integer idx = GeminiJsonUtil.asInt(candidate.get("index"));
+        Integer idx = JsonUtil.asInt(candidate.get("index"));
         if (idx != null && idx != 0) {
             putExtension(r, EXT_CANDIDATE_INDEX_RAW, idx);
         }

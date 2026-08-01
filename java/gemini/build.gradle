@@ -2,4 +2,5 @@
 // core-ir's :ir. Depends on :ir for the Translator interface + IR types.
 dependencies {
     implementation project(":ir")
+    testImplementation testFixtures(project(":ir"))
 }

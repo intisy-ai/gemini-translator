@@ -1,6 +1,7 @@
 package io.github.intisy.ai.ir.translators.gemini;
 
 import io.github.intisy.ai.ir.IrUsage;
+import io.github.intisy.ai.ir.json.JsonUtil;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,14 +22,14 @@ final class GeminiUsageCodec {
     }
 
     static IrUsage decode(Object raw) {
-        Map<String, Object> m = GeminiJsonUtil.asMap(raw);
+        Map<String, Object> m = JsonUtil.asMap(raw);
         if (m == null) return null;
         IrUsage u = new IrUsage();
-        u.inputTokens = GeminiJsonUtil.asInt(m.get("promptTokenCount"));
-        u.outputTokens = GeminiJsonUtil.asInt(m.get("candidatesTokenCount"));
-        u.cacheReadInputTokens = GeminiJsonUtil.asInt(m.get("cachedContentTokenCount"));
-        u.reasoningTokens = GeminiJsonUtil.asInt(m.get("thoughtsTokenCount"));
-        u.totalTokens = GeminiJsonUtil.asInt(m.get("totalTokenCount"));
+        u.inputTokens = JsonUtil.asInt(m.get("promptTokenCount"));
+        u.outputTokens = JsonUtil.asInt(m.get("candidatesTokenCount"));
+        u.cacheReadInputTokens = JsonUtil.asInt(m.get("cachedContentTokenCount"));
+        u.reasoningTokens = JsonUtil.asInt(m.get("thoughtsTokenCount"));
+        u.totalTokens = JsonUtil.asInt(m.get("totalTokenCount"));
         return u;
     }
 

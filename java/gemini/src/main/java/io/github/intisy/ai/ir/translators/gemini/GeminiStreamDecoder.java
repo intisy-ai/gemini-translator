@@ -2,6 +2,7 @@ package io.github.intisy.ai.ir.translators.gemini;
 
 import io.github.intisy.ai.ir.IrStopReason;
 import io.github.intisy.ai.ir.IrUsage;
+import io.github.intisy.ai.ir.json.JsonUtil;
 import io.github.intisy.ai.ir.spi.JsonCodec;
 import io.github.intisy.ai.ir.spi.StreamDecoder;
 import io.github.intisy.ai.ir.stream.ContentBlockKind;
@@ -104,7 +105,7 @@ final class GeminiStreamDecoder implements StreamDecoder {
         dataBuffer.setLength(0);
         sawDataLine = false;
         if (data.isEmpty() || "[DONE]".equals(data)) return;
-        Map<String, Object> frame = GeminiJsonUtil.asMap(json.parse(data));
+        Map<String, Object> frame = JsonUtil.asMap(json.parse(data));
         if (frame == null) return;
         handleFrame(frame, out);
     }
@@ -113,35 +114,35 @@ final class GeminiStreamDecoder implements StreamDecoder {
         if (!started) {
             started = true;
             MessageStartEvent ev = new MessageStartEvent();
-            ev.id = GeminiJsonUtil.asString(frame.get("responseId"));
-            ev.model = GeminiJsonUtil.asString(frame.get("modelVersion"));
+            ev.id = JsonUtil.asString(frame.get("responseId"));
+            ev.model = JsonUtil.asString(frame.get("modelVersion"));
             ev.role = "assistant";
             out.add(ev);
         }
 
-        Map<String, Object> usageMetadata = GeminiJsonUtil.asMap(frame.get("usageMetadata"));
+        Map<String, Object> usageMetadata = JsonUtil.asMap(frame.get("usageMetadata"));
         if (usageMetadata != null) {
-            if (usageMetadata.get("promptTokenCount") != null) inputTokens = GeminiJsonUtil.asInt(usageMetadata.get("promptTokenCount"));
-            if (usageMetadata.get("candidatesTokenCount") != null) outputTokens = GeminiJsonUtil.asInt(usageMetadata.get("candidatesTokenCount"));
-            if (usageMetadata.get("thoughtsTokenCount") != null) thoughtsTokens = GeminiJsonUtil.asInt(usageMetadata.get("thoughtsTokenCount"));
-            if (usageMetadata.get("totalTokenCount") != null) totalTokens = GeminiJsonUtil.asInt(usageMetadata.get("totalTokenCount"));
+            if (usageMetadata.get("promptTokenCount") != null) inputTokens = JsonUtil.asInt(usageMetadata.get("promptTokenCount"));
+            if (usageMetadata.get("candidatesTokenCount") != null) outputTokens = JsonUtil.asInt(usageMetadata.get("candidatesTokenCount"));
+            if (usageMetadata.get("thoughtsTokenCount") != null) thoughtsTokens = JsonUtil.asInt(usageMetadata.get("thoughtsTokenCount"));
+            if (usageMetadata.get("totalTokenCount") != null) totalTokens = JsonUtil.asInt(usageMetadata.get("totalTokenCount"));
         }
 
-        List<Object> candidates = GeminiJsonUtil.asList(frame.get("candidates"));
-        Map<String, Object> candidate0 = (candidates == null || candidates.isEmpty()) ? null : GeminiJsonUtil.asMap(candidates.get(0));
+        List<Object> candidates = JsonUtil.asList(frame.get("candidates"));
+        Map<String, Object> candidate0 = (candidates == null || candidates.isEmpty()) ? null : JsonUtil.asMap(candidates.get(0));
         if (candidate0 == null) return;
 
-        Map<String, Object> content = GeminiJsonUtil.asMap(candidate0.get("content"));
-        List<Object> parts = content == null ? null : GeminiJsonUtil.asList(content.get("parts"));
+        Map<String, Object> content = JsonUtil.asMap(candidate0.get("content"));
+        List<Object> parts = content == null ? null : JsonUtil.asList(content.get("parts"));
         if (parts != null) {
             for (Object partObj : parts) {
-                Map<String, Object> part = GeminiJsonUtil.asMap(partObj);
+                Map<String, Object> part = JsonUtil.asMap(partObj);
                 if (part == null) continue;
                 handlePart(part, out);
             }
         }
 
-        String finishReason = GeminiJsonUtil.asString(candidate0.get("finishReason"));
+        String finishReason = JsonUtil.asString(candidate0.get("finishReason"));
         if (finishReason != null) {
             closeBlock(out);
             MessageDeltaEvent mde = new MessageDeltaEvent();
@@ -159,9 +160,9 @@ final class GeminiStreamDecoder implements StreamDecoder {
             index++;
             blockOpen = true;
             blockKind = ContentBlockKind.TOOL_USE;
-            Map<String, Object> fc = GeminiJsonUtil.asMap(part.get("functionCall"));
-            String toolId = GeminiJsonUtil.asString(fc.get("id"));
-            String toolName = GeminiJsonUtil.asString(fc.get("name"));
+            Map<String, Object> fc = JsonUtil.asMap(part.get("functionCall"));
+            String toolId = JsonUtil.asString(fc.get("id"));
+            String toolName = JsonUtil.asString(fc.get("name"));
             ContentBlockStartEvent start = new ContentBlockStartEvent();
             start.index = index;
             start.blockKind = ContentBlockKind.TOOL_USE;
@@ -181,7 +182,7 @@ final class GeminiStreamDecoder implements StreamDecoder {
         }
 
         if (Boolean.TRUE.equals(part.get("thought"))) {
-            String text = GeminiJsonUtil.asString(part.get("text"));
+            String text = JsonUtil.asString(part.get("text"));
             boolean hasText = text != null && !text.isEmpty();
             if (hasText && !(blockOpen && ContentBlockKind.THINKING.equals(blockKind))) {
                 openBlock(out, ContentBlockKind.THINKING);
@@ -192,7 +193,7 @@ final class GeminiStreamDecoder implements StreamDecoder {
                 delta.text = text;
                 out.add(delta);
             }
-            String signature = GeminiJsonUtil.asString(part.get("thoughtSignature"));
+            String signature = JsonUtil.asString(part.get("thoughtSignature"));
             if (signature != null) {
                 // A signature can arrive on its own trailing chunk (no text); it still needs an
                 // open thinking block to attach to, matching a thinking_delta's index.

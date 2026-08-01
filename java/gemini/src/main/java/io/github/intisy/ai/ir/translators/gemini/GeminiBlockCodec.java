@@ -7,6 +7,7 @@ import io.github.intisy.ai.ir.ThinkingBlock;
 import io.github.intisy.ai.ir.ToolResultBlock;
 import io.github.intisy.ai.ir.ToolUseBlock;
 import io.github.intisy.ai.ir.UnknownBlock;
+import io.github.intisy.ai.ir.json.JsonUtil;
 import io.github.intisy.ai.ir.spi.JsonCodec;
 
 import java.util.ArrayList;
@@ -55,10 +56,10 @@ final class GeminiBlockCodec {
     // ---- lists -------------------------------------------------------------------------------
 
     static List<Block> decodePartsList(JsonCodec json, Object raw) {
-        List<Object> list = GeminiJsonUtil.asList(raw);
+        List<Object> list = JsonUtil.asList(raw);
         if (list == null) return null;
         List<Block> out = new ArrayList<>();
-        for (Object item : list) out.add(decodePart(json, GeminiJsonUtil.asMap(item)));
+        for (Object item : list) out.add(decodePart(json, JsonUtil.asMap(item)));
         return out;
     }
 
@@ -90,29 +91,29 @@ final class GeminiBlockCodec {
         if (part == null) return null;
 
         if (part.get("functionCall") instanceof Map) {
-            return decodeFunctionCall(GeminiJsonUtil.asMap(part.get("functionCall")));
+            return decodeFunctionCall(JsonUtil.asMap(part.get("functionCall")));
         }
         if (part.get("functionResponse") instanceof Map) {
-            return decodeFunctionResponse(json, GeminiJsonUtil.asMap(part.get("functionResponse")));
+            return decodeFunctionResponse(json, JsonUtil.asMap(part.get("functionResponse")));
         }
         if (part.get("inlineData") instanceof Map) {
-            Map<String, Object> inline = GeminiJsonUtil.asMap(part.get("inlineData"));
+            Map<String, Object> inline = JsonUtil.asMap(part.get("inlineData"));
             ImageBlock img = new ImageBlock();
-            img.mediaType = GeminiJsonUtil.asString(inline.get("mimeType"));
-            img.data = GeminiJsonUtil.asString(inline.get("data"));
+            img.mediaType = JsonUtil.asString(inline.get("mimeType"));
+            img.data = JsonUtil.asString(inline.get("data"));
             return img;
         }
         if (part.get("fileData") instanceof Map) {
-            Map<String, Object> file = GeminiJsonUtil.asMap(part.get("fileData"));
+            Map<String, Object> file = JsonUtil.asMap(part.get("fileData"));
             ImageBlock img = new ImageBlock();
-            img.mediaType = GeminiJsonUtil.asString(file.get("mimeType"));
-            img.url = GeminiJsonUtil.asString(file.get("fileUri"));
+            img.mediaType = JsonUtil.asString(file.get("mimeType"));
+            img.url = JsonUtil.asString(file.get("fileUri"));
             return img;
         }
         if (Boolean.TRUE.equals(part.get("thought"))) {
             ThinkingBlock t = new ThinkingBlock();
-            t.text = GeminiJsonUtil.asString(part.get("text"));
-            t.signature = GeminiJsonUtil.asString(part.get("thoughtSignature"));
+            t.text = JsonUtil.asString(part.get("text"));
+            t.signature = JsonUtil.asString(part.get("thoughtSignature"));
             return t;
         }
         if (part.get("text") instanceof String) {
@@ -129,9 +130,9 @@ final class GeminiBlockCodec {
 
     private static Block decodeFunctionCall(Map<String, Object> fc) {
         ToolUseBlock t = new ToolUseBlock();
-        t.name = GeminiJsonUtil.asString(fc.get("name"));
+        t.name = JsonUtil.asString(fc.get("name"));
         t.input = fc.get("args");
-        String id = GeminiJsonUtil.asString(fc.get("id"));
+        String id = JsonUtil.asString(fc.get("id"));
         if (id != null) {
             t.id = id;
         } else {
@@ -143,11 +144,11 @@ final class GeminiBlockCodec {
 
     private static Block decodeFunctionResponse(JsonCodec json, Map<String, Object> fr) {
         ToolResultBlock r = new ToolResultBlock();
-        String id = GeminiJsonUtil.asString(fr.get("id"));
-        String name = GeminiJsonUtil.asString(fr.get("name"));
+        String id = JsonUtil.asString(fr.get("id"));
+        String name = JsonUtil.asString(fr.get("name"));
         r.toolUseId = id != null ? id : name;
 
-        Map<String, Object> response = GeminiJsonUtil.asMap(fr.get("response"));
+        Map<String, Object> response = JsonUtil.asMap(fr.get("response"));
         if (response == null) {
             r.content = wrapStringAsBlocks("");
         } else if (isCleanResultShape(response)) {

@@ -7,6 +7,7 @@ import io.github.intisy.ai.ir.IrThinking;
 import io.github.intisy.ai.ir.IrTool;
 import io.github.intisy.ai.ir.IrToolChoice;
 import io.github.intisy.ai.ir.ToolUseBlock;
+import io.github.intisy.ai.ir.json.JsonUtil;
 import io.github.intisy.ai.ir.spi.JsonCodec;
 
 import java.util.ArrayList;
@@ -79,11 +80,11 @@ final class GeminiRequestCodec {
     // ---- decode --------------------------------------------------------------------------------
 
     static IrRequest decodeRequest(JsonCodec json, String wireJson) {
-        Map<String, Object> root = GeminiJsonUtil.asMap(json.parse(wireJson));
+        Map<String, Object> root = JsonUtil.asMap(json.parse(wireJson));
         IrRequest r = new IrRequest();
         if (root == null) return r;
 
-        r.model = GeminiJsonUtil.asString(root.get("model"));
+        r.model = JsonUtil.asString(root.get("model"));
         r.messages = decodeContents(json, root.get("contents"));
         decodeSystemInstruction(root.get("systemInstruction"), json, r);
         decodeTools(root.get("tools"), r);
@@ -99,10 +100,10 @@ final class GeminiRequestCodec {
     }
 
     private static List<IrMessage> decodeContents(JsonCodec json, Object raw) {
-        List<Object> list = GeminiJsonUtil.asList(raw);
+        List<Object> list = JsonUtil.asList(raw);
         if (list == null) return null;
         List<IrMessage> out = new ArrayList<>();
-        for (Object item : list) out.add(decodeContent(json, GeminiJsonUtil.asMap(item)));
+        for (Object item : list) out.add(decodeContent(json, JsonUtil.asMap(item)));
         return out;
     }
 
@@ -120,7 +121,7 @@ final class GeminiRequestCodec {
     }
 
     private static void decodeSystemInstruction(Object raw, JsonCodec json, IrRequest r) {
-        Map<String, Object> si = GeminiJsonUtil.asMap(raw);
+        Map<String, Object> si = JsonUtil.asMap(raw);
         if (si == null) return;
         r.system = GeminiBlockCodec.decodePartsList(json, si.get("parts"));
         Map<String, Object> extra = new LinkedHashMap<>();
@@ -131,25 +132,25 @@ final class GeminiRequestCodec {
     }
 
     private static void decodeTools(Object raw, IrRequest r) {
-        List<Object> toolsList = GeminiJsonUtil.asList(raw);
+        List<Object> toolsList = JsonUtil.asList(raw);
         if (toolsList == null) return;
 
         List<IrTool> irTools = new ArrayList<>();
         List<Object> extra = new ArrayList<>();
 
         for (Object entry : toolsList) {
-            Map<String, Object> te = GeminiJsonUtil.asMap(entry);
-            List<Object> declarations = te == null ? null : GeminiJsonUtil.asList(te.get("functionDeclarations"));
+            Map<String, Object> te = JsonUtil.asMap(entry);
+            List<Object> declarations = te == null ? null : JsonUtil.asList(te.get("functionDeclarations"));
             if (declarations == null) {
                 extra.add(entry);
                 continue;
             }
             for (Object declObj : declarations) {
-                Map<String, Object> decl = GeminiJsonUtil.asMap(declObj);
+                Map<String, Object> decl = JsonUtil.asMap(declObj);
                 if (decl == null) continue;
                 IrTool t = new IrTool();
-                t.name = GeminiJsonUtil.asString(decl.get("name"));
-                t.description = GeminiJsonUtil.asString(decl.get("description"));
+                t.name = JsonUtil.asString(decl.get("name"));
+                t.description = JsonUtil.asString(decl.get("description"));
                 t.inputSchema = decl.get("parameters");
                 for (Map.Entry<String, Object> e : decl.entrySet()) {
                     if (!TOOL_DECL_KNOWN_KEYS.contains(e.getKey())) {
@@ -166,12 +167,12 @@ final class GeminiRequestCodec {
     }
 
     private static void decodeToolConfig(Object raw, IrRequest r) {
-        Map<String, Object> tc = GeminiJsonUtil.asMap(raw);
-        Map<String, Object> fc = tc == null ? null : GeminiJsonUtil.asMap(tc.get("functionCallingConfig"));
+        Map<String, Object> tc = JsonUtil.asMap(raw);
+        Map<String, Object> fc = tc == null ? null : JsonUtil.asMap(tc.get("functionCallingConfig"));
         if (fc == null) return;
 
-        String mode = GeminiJsonUtil.asString(fc.get("mode"));
-        List<Object> allowed = GeminiJsonUtil.asList(fc.get("allowedFunctionNames"));
+        String mode = JsonUtil.asString(fc.get("mode"));
+        List<Object> allowed = JsonUtil.asList(fc.get("allowedFunctionNames"));
 
         IrToolChoice c = new IrToolChoice();
         if ("AUTO".equals(mode)) {
@@ -196,27 +197,27 @@ final class GeminiRequestCodec {
     }
 
     private static void decodeGenerationConfig(Object raw, IrRequest r) {
-        Map<String, Object> gc = GeminiJsonUtil.asMap(raw);
+        Map<String, Object> gc = JsonUtil.asMap(raw);
         if (gc == null) return;
 
-        r.maxTokens = GeminiJsonUtil.asInt(gc.get("maxOutputTokens"));
-        r.temperature = GeminiJsonUtil.asDouble(gc.get("temperature"));
-        r.topP = GeminiJsonUtil.asDouble(gc.get("topP"));
-        r.topK = GeminiJsonUtil.asInt(gc.get("topK"));
-        List<Object> stop = GeminiJsonUtil.asList(gc.get("stopSequences"));
+        r.maxTokens = JsonUtil.asInt(gc.get("maxOutputTokens"));
+        r.temperature = JsonUtil.asDouble(gc.get("temperature"));
+        r.topP = JsonUtil.asDouble(gc.get("topP"));
+        r.topK = JsonUtil.asInt(gc.get("topK"));
+        List<Object> stop = JsonUtil.asList(gc.get("stopSequences"));
         if (stop != null) {
             List<String> ss = new ArrayList<>();
             for (Object o : stop) ss.add(String.valueOf(o));
             r.stopSequences = ss;
         }
 
-        Map<String, Object> tc = GeminiJsonUtil.asMap(gc.get("thinkingConfig"));
+        Map<String, Object> tc = JsonUtil.asMap(gc.get("thinkingConfig"));
         if (tc != null) {
             IrThinking thinking = new IrThinking();
             thinking.enabled = true;
-            thinking.budgetTokens = GeminiJsonUtil.asInt(tc.get("thinkingBudget"));
+            thinking.budgetTokens = JsonUtil.asInt(tc.get("thinkingBudget"));
             r.thinking = thinking;
-            Boolean includeThoughts = GeminiJsonUtil.asBoolean(tc.get("includeThoughts"));
+            Boolean includeThoughts = JsonUtil.asBoolean(tc.get("includeThoughts"));
             if (includeThoughts != null) putExtension(r, EXT_INCLUDE_THOUGHTS, includeThoughts);
             Map<String, Object> tcExtra = new LinkedHashMap<>();
             for (Map.Entry<String, Object> e : tc.entrySet()) {
