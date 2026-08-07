@@ -3,6 +3,7 @@ package io.github.intisy.ai.js;
 import io.github.intisy.ai.ir.IrRequest;
 import io.github.intisy.ai.ir.IrResponse;
 import io.github.intisy.ai.ir.spi.JsonCodec;
+import io.github.intisy.ai.ir.json.SimpleJsonCodec;
 import io.github.intisy.ai.ir.spi.StreamDecoder;
 import io.github.intisy.ai.ir.spi.StreamEncoder;
 import io.github.intisy.ai.ir.spi.Translator;
