@@ -1,0 +1,4 @@
+# The Gradle wrapper is executed directly on Linux CI, where a CRLF line ending
+# makes the shebang unparseable and the run dies with ENOENT rather than anything
+# that names the real problem.
+java/gradlew text eol=lf
