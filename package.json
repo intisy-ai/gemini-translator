@@ -28,7 +28,7 @@
   },
   "scripts": {
     "build:coreir": "npm --prefix core-ir install && npm --prefix core-ir run build",
-    "build:teavm": "node teavm-build.mjs --java-dir java --module :teavm-gemini --out src/generated/gemini-translator.teavm.js",
+    "build:teavm": "node teavm-build.mjs --java-dir . --module :teavm-gemini --out src/generated/gemini-translator.teavm.js",
     "build": "npm run build:coreir && npm run build:teavm && tsc && node build.mjs",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
