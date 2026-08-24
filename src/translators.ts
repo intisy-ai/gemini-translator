@@ -1,5 +1,5 @@
 import { loadGeminiTranslator } from "./index.js";
-import { makeVendorTranslator } from "../core-ir/dist/index.js";
+import { makeVendorTranslator } from "@intisy-ai/core-ir";
 
 export const geminiTranslator = makeVendorTranslator(loadGeminiTranslator, {
   decodeRequest: (m) => m.geminiDecodeRequest,

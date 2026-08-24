@@ -8,4 +8,4 @@ export function loadGeminiTranslator(): Promise<typeof import("./generated/gemin
 }
 
 export * from "./translators.js";
-export * from "../core-ir/dist/index.js";
+export * from "@intisy-ai/core-ir";
