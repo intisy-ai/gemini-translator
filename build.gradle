@@ -14,7 +14,9 @@ subprojects {
     }
 
     group = "io.github.intisy"
-    version = "0.1.0"
+    // publishGithub requires a concrete version. Derive it from -Partifact_version=<tag> passed
+    // by CI (stripping a leading "v"), falling back to a local dev version.
+    version = (project.findProperty("artifact_version") ?: "0.0.0-dev").toString().replaceFirst(/^v/, "")
 
     repositories {
         mavenLocal()
@@ -43,5 +45,37 @@ subprojects {
 
     test {
         useJUnitPlatform()
+    }
+}
+
+// The module a downstream java consumer resolves, mapped to the classifier its coordinate names.
+ext.PUBLISHED_MODULES = [
+    ":gemini": "gemini",
+]
+
+configure(subprojects.findAll { PUBLISHED_MODULES.containsKey(it.path) }) {
+    jar {
+        archiveVersion = ""
+    }
+
+    publishGithub {
+        // These modules sit inside this repo with no .git of their own, so the default git-remote
+        // lookup fails; owner/repo also drive the uploaded asset name (gemini-translator-<classifier>.jar).
+        owner = "intisy-ai"
+        repo = "gemini-translator"
+        releaseName = "gemini-translator ${project.findProperty('artifact_version') ?: project.version}"
+        artifacts {
+            artifact {
+                classifier = PUBLISHED_MODULES[project.path]
+                jar = file("build/libs/${project.name}.jar")
+            }
+        }
+    }
+}
+
+// A publish fanned out to every subproject would fail on the ones with no artifacts declared.
+subprojects {
+    tasks.matching { it.name == "publishGithub" }.configureEach {
+        onlyIf { project.path in rootProject.PUBLISHED_MODULES.keySet() }
     }
 }

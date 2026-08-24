@@ -1,6 +1,6 @@
 {
   "name": "gemini-translator",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Gemini wire-format <-> canonical IR translator (Java + TeaVM single source), a core-ir submodule library.",
   "main": "dist/index.js",
   "type": "module",
