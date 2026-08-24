@@ -1,0 +1,19 @@
+plugins {
+    id "org.gradle.toolchains.foojay-resolver-convention" version "0.8.0"
+}
+
+rootProject.name = "gemini-translator-java"
+
+// :ir is core-ir's neutral IR module, reached via the nested core-ir submodule (path re-declared
+// here, the ecosystem convention: Gradle settings do not nest, so every consumer re-declares it).
+// :ir comes from core-ir's published jars, resolved by github-gradle from its release assets.
+
+// :annotations, :processor and :contract come from api, reached through core-ir's own api submodule
+// because :ir exports api's seam types in HandlerCtx's public fields and emits its own TypeScript,
+// so any build including :ir must resolve api at the same coordinates.
+// :annotations, :processor and :contract likewise come from api's published jars.
+
+// :gemini       - the Gemini translator + codecs (Java 8, zero-dep, TeaVM-clean).
+// :teavm-gemini - TeaVM JS export surface over :gemini + :ir.
+include ":gemini"
+include ":teavm-gemini"
