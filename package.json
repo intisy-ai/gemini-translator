@@ -27,13 +27,16 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build:coreir": "npm --prefix core-ir install && npm --prefix core-ir run build",
-    "build:teavm": "node teavm-build.mjs --java-dir . --module :teavm-gemini --out src/generated/gemini-translator.teavm.js",
-    "build": "npm run build:coreir && npm run build:teavm && tsc && node build.mjs",
+    "build:teavm": "node node_modules/@intisy-ai/api/scripts/teavm-build.mjs --java-dir . --module :teavm-gemini --out src/generated/gemini-translator.teavm.js",
+    "build": "npm run build:teavm && tsc && node build.mjs",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
+  "dependencies": {
+    "@intisy-ai/core-ir": "^1.0.3"
+  },
   "devDependencies": {
+    "@intisy-ai/api": "^1.0.2",
     "@types/node": "^22.0.0",
     "esbuild": "^0.21.5",
     "typescript": "^5.6.0",
