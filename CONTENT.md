@@ -1,5 +1,3 @@
-# gemini-translator
-
 Google Gemini `generateContent`/`streamGenerateContent` vendor translator for the canonical IR
 (internal representation) used across the intisy AI-tooling ecosystem. Java + TeaVM single-source,
 so the exact same request, response, and streaming codecs compile to a JVM jar and to a JS module:
@@ -106,7 +104,3 @@ TS: `npm run build && npx vitest run` (`build` stages the TeaVM JS, `tsc`s, then
 esbuild; `test` round-trips the translator from TS). Both layers use the same round-trip fixture
 approach: a captured Gemini wire payload decoded to IR and re-encoded, asserting the result matches
 the original shape rather than a byte-identical string.
-
-## License
-
-MIT
