@@ -1,5 +1,10 @@
 # gemini-translator
 
+[![npm version](https://img.shields.io/npm/v/gemini-translator)](https://www.npmjs.com/package/gemini-translator)
+[![npm downloads](https://img.shields.io/npm/dm/gemini-translator)](https://www.npmjs.com/package/gemini-translator)
+
+Gemini wire-format translator for the intisy-ai AI-proxy ecosystem.
+
 Google Gemini `generateContent`/`streamGenerateContent` vendor translator for the canonical IR
 (internal representation) used across the intisy AI-tooling ecosystem. Java + TeaVM single-source,
 so the exact same request, response, and streaming codecs compile to a JVM jar and to a JS module:
@@ -18,8 +23,8 @@ flowchart LR
   RESP --> TR
   SSE --> TR
   IR[core-ir: IrRequest / IrResponse / IrStreamEvent] --> TR
-  TR -->|":gemini" module| GEMINI[java/gemini]
-  GEMINI -->|TeaVM generateJavaScript| GEN[java/teavm-gemini build/generated/teavm/js]
+  TR -->|":gemini" module| GEMINI[gemini]
+  GEMINI -->|TeaVM generateJavaScript| GEN[teavm-gemini build/generated/teavm/js]
   GEN -->|teavm-build.mjs stage| STAGED[src/generated/gemini-translator.teavm.js]
   STAGED -->|tsc + esbuild| DIST[dist/index.js]
   DIST --> API["src/translators.ts: geminiTranslator"]
@@ -29,7 +34,7 @@ flowchart LR
 `decodeResponse`/`encodeResponse`, and stateful `newStreamDecoder()`/`newStreamEncoder()` for true
 streaming (no buffer-and-reconvert). The `:gemini` module holds the codecs and is
 zero-dependency, Java-8-clean; `:teavm-gemini` is the TeaVM export surface over `:gemini` and
-the nested `:ir` module, transpiled to a single JS bundle. The TS surface (`geminiTranslator`)
+core-ir's `:ir` module, transpiled to a single JS bundle. The TS surface (`geminiTranslator`)
 is a thin async wrapper over that generated JS, so callers never touch the TeaVM handle directly.
 
 ## Structure
@@ -46,30 +51,33 @@ is a thin async wrapper over that generated JS, so callers never touch the TeaVM
   (the `.js` itself is gitignored build output).
 - `src/__tests__/` - `smoke.test.ts` (toolchain round trip) and `translators.test.ts` (request and
   response round trips).
-- `java/gemini/` - the Gemini codecs (`GeminiRequestCodec`, `GeminiResponseCodec`,
+- `gemini/` - the Gemini codecs (`GeminiRequestCodec`, `GeminiResponseCodec`,
   `GeminiStreamDecoder`, `GeminiStreamEncoder`, `GeminiBlockCodec`, `GeminiUsageCodec`,
   `GeminiFinishReason`, `GeminiJsonUtil`) plus `GeminiTranslator`, the `Translator`
-  implementation that ties them together. Depends on the nested `core-ir`'s `:ir` module for the
+  implementation that ties them together. Depends on core-ir's `:ir` module for the
   IR types and the codec SPI.
-- `java/teavm-gemini/` - the TeaVM JS export surface (`GeminiTranslatorJs`), transpiling
+- `teavm-gemini/` - the TeaVM JS export surface (`GeminiTranslatorJs`), transpiling
   `:gemini` and `:ir` to `gemini-translator.js`.
-- `java/settings.gradle` / `java/build.gradle` / `java/gradlew*` - self-contained Gradle build
-  (Java 8 for `:gemini`, Java 17 override for `:teavm-gemini`), re-declaring the nested `:ir`
-  module's project path (Gradle settings do not nest across submodules).
+- `settings.gradle` / `build.gradle` / `gradlew*` - self-contained Gradle build
+  (Java 8 for `:gemini`, Java 17 override for `:teavm-gemini`), declaring core-ir's `:ir`
+  module as a github-gradle coordinate.
 
 ## Installation
 
-Via git submodule (the ecosystem convention for a `*-translator` repo consumed by a plugin):
+TypeScript, as a published npm package:
 
 ```bash
-git submodule add https://github.com/intisy-ai/gemini-translator.git gemini-translator
-git submodule update --init --recursive
+npm install @intisy-ai/gemini-translator
 ```
 
-`gemini-translator` itself nests `core-ir` as a submodule, so a recursive submodule update is
-required (`--init --recursive`, or `git submodule update --init --recursive` from the consuming
-repo's root) to pull both levels before building. It is a submodule-consumed library like
-`core-ir`/`core-proxy`, not an npm package, so there is no `npm install` step.
+Java, as a `github-gradle` coordinate resolving this repo's released `:gemini` jar:
+
+```groovy
+githubImplementation "intisy-ai:gemini-translator:1.1.0:gemini"
+```
+
+No checkout of this repo or of `core-ir` is needed, or wanted: a nested checkout is a third
+resolver beside the package manifest and the build file, and it can disagree with both.
 
 ## Usage
 
@@ -106,4 +114,4 @@ the original shape rather than a byte-identical string.
 
 ## License
 
-MIT
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
