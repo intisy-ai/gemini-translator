@@ -28,9 +28,10 @@
   },
   "scripts": {
     "build:teavm": "node node_modules/@intisy-ai/api/scripts/teavm-build.mjs --java-dir . --module :teavm-gemini --out src/generated/gemini-translator.teavm.js",
-    "build": "npm run build:teavm && tsc && node build.mjs",
-    "test": "vitest run",
-    "prepublishOnly": "npm run build"
+    "build": "npm run emit:teavm && npm run build:teavm && tsc && node build.mjs",
+    "test": "npm run build && vitest run",
+    "prepublishOnly": "npm run build",
+    "emit:teavm": "node node_modules/@intisy-ai/api/scripts/emit-dts.mjs --java-dir . --module :teavm-gemini --out src/generated"
   },
   "dependencies": {
     "@intisy-ai/core-ir": "^1.3.0"
