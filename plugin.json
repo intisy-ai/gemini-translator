@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/@intisy-ai/api/schema/plugin.schema.json",
+  "id": "gemini-translator",
+  "api": 1,
+  "publish": {
+    "jarModule": [
+      "gemini"
+    ]
+  },
+  "repo": {
+    "role": "Gemini wire-format translator",
+    "category": "vendor-translator",
+    "domains": [
+      "gemini"
+    ],
+    "tech": [
+      "java",
+      "teavm"
+    ]
+  }
+}

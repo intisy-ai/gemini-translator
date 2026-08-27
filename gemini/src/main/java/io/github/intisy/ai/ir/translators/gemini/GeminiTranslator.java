@@ -31,6 +31,11 @@ import io.github.intisy.ai.ir.spi.Translator;
 public final class GeminiTranslator implements Translator {
     private final JsonCodec json;
 
+    /**
+     * Builds a translator over one codec.
+     *
+     * @param json the codec every read and write in this translator goes through
+     */
     public GeminiTranslator(JsonCodec json) {
         this.json = json;
     }
