@@ -1,0 +1,32 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts"
+  ],
+  "out": "site",
+  "name": "@intisy-ai/gemini-translator",
+  "excludePrivate": true,
+  "treatWarningsAsErrors": true,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": true
+  },
+  "highlightLanguages": [
+    "bash",
+    "groovy",
+    "java",
+    "js",
+    "json",
+    "ts",
+    "typescript"
+  ],
+  "ignoredHighlightLanguages": [
+    "mermaid"
+  ],
+  "sourceLinkTemplate": "https://github.com/intisy-ai/gemini-translator/blob/{gitRevision}/{path}#L{line}",
+  "tsconfig": "./tsconfig.json",
+  "intentionallyNotExported": [
+    "__module"
+  ]
+}

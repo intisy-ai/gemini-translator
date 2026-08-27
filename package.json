@@ -31,15 +31,18 @@
     "build": "npm run emit:teavm && npm run build:teavm && tsc && node build.mjs",
     "test": "npm run build && vitest run",
     "prepublishOnly": "npm run build",
-    "emit:teavm": "node node_modules/@intisy-ai/api/scripts/emit-dts.mjs --java-dir . --module :teavm-gemini --out src/generated"
+    "emit:teavm": "node node_modules/@intisy-ai/api/scripts/emit-dts.mjs --java-dir . --module :teavm-gemini --out src/generated",
+    "docs": "typedoc"
   },
   "dependencies": {
+    "@intisy-ai/api": "^1.6.0",
     "@intisy-ai/core-ir": "^1.4.0"
   },
   "devDependencies": {
     "@intisy-ai/api": "^1.0.2",
     "@types/node": "^22.0.0",
     "esbuild": "^0.21.5",
+    "typedoc": "^0.28.20",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
   }
