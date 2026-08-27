@@ -14,6 +14,8 @@ public interface JsStreamEncoderHandle {
     /**
      * Encodes one IR stream event to this vendor's wire text.
      *
+     * @param irEventJson the IR stream event
+     * @return the wire text to emit
      * @implNote An event with no wire representation for this vendor encodes to the empty string
      * rather than being reported as an error.
      */

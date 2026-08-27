@@ -15,6 +15,8 @@ public interface JsStreamDecoderHandle {
     /**
      * Feeds one raw vendor chunk and returns the IR stream events it completed, as a JSON array.
      *
+     * @param chunk the bytes as they arrived, at whatever boundary the transport gave them
+     * @return the IR stream events the chunk completed, as a JSON array
      * @implNote Partial lines and frames are buffered inside the handle across calls, so a chunk
      * completing nothing correctly returns an empty array.
      */
