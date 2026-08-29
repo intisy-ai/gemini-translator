@@ -1,6 +1,6 @@
 // The Gemini translator's Java module, a self-contained Gradle build living alongside the TS
 // (../src, ../package.json). Its one job is to compile and test the translator and TeaVM-transpile
-// it to JS; github-gradle is applied only to resolve core-ir's published jars, not to publish.
+// it to JS; github-gradle is applied only to resolve basekit's published jars, not to publish.
 plugins {
     id "io.github.intisy.github-gradle" version "1.10.3" apply false
 }

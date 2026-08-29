@@ -8,7 +8,7 @@ plugins {
 dependencies {
     // teavm transpiles :ir's + :gemini's pure types -- no gson/net/nio/etc, matching their own
     // zero-dependency policy.
-    githubImplementation "intisy-ai:core-ir:1.4.0:ir"
+    githubImplementation "intisy-ai:basekit:4.0.0:ir"
     implementation project(":gemini")
     // SOURCE-retention, so nothing here reaches the bundle. The processor jar is a release asset and
     // carries no transitive metadata, so the annotation types it reads are named beside it.
@@ -24,7 +24,7 @@ dependencies {
 // a newer compile target than :ir/:gemini -- override both the extension's compatibility (fixes
 // Gradle's dependency-resolution JVM-version attribute matching) and the compileJava task's
 // --release option (which the root block sets via tasks.matching{}.configureEach{}, applied
-// before this script runs, last-registered-wins). Mirrors core-ir's teavm/build.gradle exactly.
+// before this script runs, last-registered-wins). Mirrors basekit's ir-teavm/build.gradle exactly.
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17

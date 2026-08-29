@@ -4,7 +4,7 @@ plugins {
 
 rootProject.name = "gemini-translator-java"
 
-// :ir is core-ir's neutral IR module, resolved by github-gradle from core-ir's release assets.
+// :ir is basekit's neutral IR module, resolved by github-gradle from basekit's release assets.
 // :annotations, :processor and :contract come from api the same way: :ir exports api's seam types
 // in HandlerCtx's public fields and emits its own TypeScript, so any build including :ir must
 // resolve api at the same coordinates.
