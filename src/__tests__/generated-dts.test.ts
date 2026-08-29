@@ -10,7 +10,7 @@ const repo = fileURLToPath(new URL("../..", import.meta.url));
 it("keeps the committed teavm declarations identical to what the java emits", () => {
   const scratch = mkdtempSync(join(tmpdir(), "gemini-dts-"));
   execFileSync(process.execPath, [
-    join(repo, "node_modules", "@intisy-ai", "api", "scripts", "emit-dts.mjs"),
+    join(repo, "node_modules", "@intisy", "bayonet", "scripts", "emit-dts.mjs"),
     "--java-dir", repo,
     "--module", ":teavm-gemini",
     "--out", scratch,

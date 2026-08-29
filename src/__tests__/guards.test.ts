@@ -1,4 +1,4 @@
-import { guardDocumentation, guardGeneratedSurface, guardNoSuppressions } from "@intisy-ai/api/testing";
+import { guardDocumentation, guardGeneratedSurface, guardNoSuppressions } from "@intisy/bayonet/testing";
 
 guardDocumentation({ dir: new URL("..", import.meta.url) });
 guardNoSuppressions({ dir: new URL("..", import.meta.url) });
