@@ -1,6 +1,6 @@
 // Gemini translator + codecs. Zero-dependency, Java-8-clean (TeaVM-transpilable), mirroring
-// core-ir's :ir. Depends on :ir for the Translator interface + IR types.
+// basekit's :ir. Depends on :ir for the Translator interface + IR types.
 dependencies {
-    githubImplementation "intisy-ai:core-ir:1.4.0:ir"
-    githubTestImplementation "intisy-ai:core-ir:1.4.0:ir-test-fixtures"
+    githubImplementation "intisy-ai:basekit:4.0.0:ir"
+    githubTestImplementation "intisy-ai:basekit:4.0.0:ir-test-fixtures"
 }
